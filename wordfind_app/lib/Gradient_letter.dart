@@ -11,7 +11,6 @@ class GradientLetter extends StatelessWidget {
       textContainerRadius,
       containerRadius;
 
-
   const GradientLetter(
       {super.key,
       required this.letter,
@@ -38,7 +37,7 @@ class GradientLetter extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(textContainerRadius),
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   stops: [-0.025, 1.6875],
@@ -48,7 +47,9 @@ class GradientLetter extends StatelessWidget {
             child: Text(
               letter,
               style: TextStyle(
-                  fontSize: fontsize, height: 52/fontHeight, color: Colors.white),
+                  fontSize: fontsize,
+                  height: 52 / fontHeight,
+                  color: Colors.white),
             ),
           ),
         ),

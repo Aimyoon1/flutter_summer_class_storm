@@ -12,7 +12,7 @@ class GradientText extends StatelessWidget {
       style: TextStyle(
           fontSize: size,
           foreground: Paint()
-            ..shader = LinearGradient(
+            ..shader = const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     stops: [0.0661, 0.761],
