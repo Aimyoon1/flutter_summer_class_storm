@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wordfind_app/start_page.dart';
+import 'package:wordfind_app/screens/start_screen.dart';
 
 void main() {
   runApp(const MyApp());

@@ -9,6 +9,7 @@ class GradientLetter extends StatelessWidget {
       fontHeight,
       fontsize,
       textContainerRadius,
+      marginRight,
       containerRadius;
 
   const GradientLetter(
@@ -21,11 +22,13 @@ class GradientLetter extends StatelessWidget {
       required this.fontsize,
       required this.textContainerHeight,
       required this.textContainerWidth,
+      required this.marginRight,
       required this.textContainerRadius});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(right: marginRight),
       width: containerWidth,
       height: containerHeight,
       decoration: BoxDecoration(

@@ -1,8 +1,10 @@
 import 'dart:math';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:wordfind_app/gradient_letter.dart';
-import 'package:wordfind_app/gradient_text.dart';
+import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/gradient_letter.dart';
+import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/gradient_text.dart';
+import 'package:wordfind_app/custom_widgets/3_during_game_screen/chances.dart';
 
 class DuringGameScreen extends StatefulWidget {
   const DuringGameScreen({super.key});
@@ -12,20 +14,40 @@ class DuringGameScreen extends StatefulWidget {
 }
 
 class _DuringGameScreenState extends State<DuringGameScreen> {
+  // P L A Y E R ~ W A N T S ~ Q U I T ~ T H E G A M E
+  bool isPlayerQuit = false;
+
+  // C H A N C E S
+  int? chances = 5, missed = 0, remainingChances;
+
+  // M I S S I O N S ~ I M A G E S
   final List missionList = [
     const AssetImage('assets/mission1.jpeg'),
     const AssetImage('assets/mission2.jpeg'),
     const AssetImage('assets/mission3.jpeg'),
   ];
+
   late List<String> letters;
   late List wordList;
+  List<int> sequence = [];
+  int testingNumber = 0;
 
   int whatMission = 0, score = 0;
 
   @override
   void initState() {
     super.initState();
-    wordList = List.generate(gameData.length, (index) => []);
+
+    // C H A N C E S
+    remainingChances = (chances! - missed!);
+
+    wordList = List.generate(
+        gameData.length,
+        (index) => gameData[index]
+            .wordThatPlayerHasToGuess
+            .split('')
+            .map((e) => 'a')
+            .toList());
     letters = [
       ...gameData[whatMission].wordThatPlayerHasToGuess.split(''),
       ...List.generate(
@@ -33,6 +55,11 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
           (index) => String.fromCharCode(65 + Random().nextInt(27)))
     ];
     letters.shuffle();
+
+    if (kDebugMode) {
+      print(wordList);
+      print(wordList[whatMission][0]);
+    }
   }
 
   @override
@@ -64,7 +91,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                           Navigator.pop(context);
                         },
                         icon: const Icon(
-                          Icons.arrow_back,
+                          Icons.close,
                           size: 23,
                           color: Colors.white,
                         )),
@@ -84,55 +111,12 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
               const SizedBox(
                 height: 21,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      Image.asset('assets/nonColored.png'),
-                      // Image.asset('assets/ColoredOrange.png')
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Stack(
-                    children: [
-                      Image.asset('assets/nonColored.png'),
-                      // Image.asset('assets/ColoredOrange.png')
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Stack(
-                    children: [
-                      Image.asset('assets/nonColored.png'),
-                      // Image.asset('assets/ColoredOrange.png')
-                    ],
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Stack(
-                    children: [
-                      Image.asset('assets/nonColored.png'),
-                      // Image.asset('assets/ColoredOrange.png')
-                    ],
-                  ),
-                  const SizedBox(width: 5),
-                  Stack(
-                    children: [
-                      Image.asset('assets/nonColored.png'),
-                      // Image.asset('assets/ColoredOrange.png')
-                    ],
-                  )
-                ],
-              ),
+              Chances(
+                  remainingChances: remainingChances ?? 5, missed: missed ?? 0),
               const SizedBox(
                 height: 31,
               ),
-              GradientText(text: '$score/10', size: 20),
+              GradientText(text: '$score/${gameData.length}', size: 20),
               const SizedBox(
                 height: 4,
               ),
@@ -216,22 +200,34 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                         .length,
                     (index) => Row(
                           children: [
-                            GradientLetter(
-                                letter: wordList.isEmpty
-                                    ? ' '
-                                    : wordList[whatMission].length - 1 < index
-                                        ? ' '
-                                        : wordList[whatMission][index],
-                                containerHeight: 42,
-                                containerWidth: 42,
-                                containerRadius: 12,
-                                fontHeight: 38,
-                                fontsize: 13,
-                                textContainerHeight: 3 / 4,
-                                textContainerWidth: 3 / 4,
-                                textContainerRadius: 6),
-                            SizedBox(
-                              width: 7,
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  wordList[whatMission][index] = 'a';
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  GradientLetter(
+                                      marginRight: 7,
+                                      // letter: wordList.isEmpty
+                                      //     ? ' '
+                                      //     : wordList[whatMission].length - 1 < index
+                                      //         ? ' '
+                                      //         : wordList[whatMission][index],
+                                      letter: wordList.isEmpty
+                                          ? ' '
+                                          : wordList[whatMission][index],
+                                      containerHeight: 42,
+                                      containerWidth: 42,
+                                      containerRadius: 12,
+                                      fontHeight: 38,
+                                      fontsize: 24,
+                                      textContainerHeight: 3 / 4,
+                                      textContainerWidth: 3 / 4,
+                                      textContainerRadius: 6),
+                                ],
+                              ),
                             )
                           ],
                         )),
@@ -301,28 +297,44 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                             .length,
                         (index) => GestureDetector(
                             onTap: () {
-                              // bool isAddScore = listEquals(
-                              //     gameData[whatMission]
-                              //         .wordThatPlayerHasToGuess
-                              //         .split(''),
-                              //     wordList[whatMission]);
+                              for (int i = 0;
+                                  i < wordList[whatMission].length;
+                                  i++) {
+                                if (wordList[whatMission][i] == 'a') {
+                                  testingNumber = i;
+                                  break;
+                                }
+                              }
                               setState(() {
-                                wordList[whatMission].add(gameData[whatMission]
-                                    .wordThatPlayerHasToGuess
-                                    .split('')[index]
-                                    .toString());
-                                if (wordList[whatMission].length ==
+                                wordList[whatMission][testingNumber] =
                                     gameData[whatMission]
                                         .wordThatPlayerHasToGuess
-                                        .length) {
-                                  wordList[whatMission] = [];
-                                  // isAddScore ? score += 1 : score -= 1;
+                                        .split('')[index]
+                                        .toString()
+                                        .toUpperCase();
+
+                                if (listEquals(
+                                    gameData[whatMission]
+                                        .wordThatPlayerHasToGuess
+                                        .toUpperCase()
+                                        .split(''),
+                                    wordList[whatMission])) {
+                                  if (kDebugMode) {
+                                    print('gg');
+                                  }
+                                  wordList[whatMission] = gameData[whatMission]
+                                      .wordThatPlayerHasToGuess
+                                      .split('')
+                                      .map((e) => 'a')
+                                      .toList();
+                                  score++;
                                 }
                               });
                             },
                             child: Row(
                               children: [
                                 GradientLetter(
+                                    marginRight: 7,
                                     letter: gameData[whatMission]
                                         .wordThatPlayerHasToGuess
                                         .split('')[index]
@@ -335,9 +347,6 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                     textContainerHeight: 3 / 4,
                                     textContainerWidth: 3 / 4,
                                     textContainerRadius: 6),
-                                const SizedBox(
-                                  width: 7,
-                                )
                               ],
                             )),
                       ))
@@ -352,33 +361,41 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
 
   final List<GameData> gameData = [
     const GameData(
-        img: AssetImage('assets/mission1.jpeg'),
-        wordThatPlayerHasToGuess: 'Itachi',
-        hint: 'Sasuke\'s lil bro'),
+      img: AssetImage('assets/mission1.jpeg'),
+      wordThatPlayerHasToGuess: 'Itachi',
+      hint: 'Sasuke\'s lil bro',
+      isPlayerDone: false,
+    ),
     const GameData(
         img: AssetImage('assets/mission2.jpeg'),
         wordThatPlayerHasToGuess: 'Senku',
-        hint: 'Sasuke\'s lil bro'),
+        hint: 'Sasuke\'s lil bro',
+        isPlayerDone: false),
     const GameData(
         img: AssetImage('assets/mission3.jpeg'),
         wordThatPlayerHasToGuess: 'Chrollo',
-        hint: 'Sasuke\'s lil bro'),
+        hint: 'Sasuke\'s lil bro',
+        isPlayerDone: false),
   ];
 }
 
 class GameData {
   final AssetImage img;
   final String wordThatPlayerHasToGuess, hint;
-  const GameData(
-      {required this.img,
-      required this.wordThatPlayerHasToGuess,
-      required this.hint});
+  final bool isPlayerDone;
+  // List<String> playerAnswerList;
+  const GameData({
+    required this.img,
+    required this.wordThatPlayerHasToGuess,
+    required this.hint,
+    required this.isPlayerDone,
+  });
 }
 
-    // letters = [
-    //   ...gameData[whatMission].wordThatPlayerHasToGuess.split(''),
-    //   ...List.generate(
-    //       14 - gameData[whatMission].wordThatPlayerHasToGuess.split('').length,
-    //       (index) => String.fromCharCode(65 + Random().nextInt(27)))
-    // ];
-    // letters.shuffle();
+// letters = [
+//   ...gameData[whatMission].wordThatPlayerHasToGuess.split(''),
+//   ...List.generate(
+//       14 - gameData[whatMission].wordThatPlayerHasToGuess.split('').length,
+//       (index) => String.fromCharCode(65 + Random().nextInt(27)))
+// ];
+// letters.shuffle();
