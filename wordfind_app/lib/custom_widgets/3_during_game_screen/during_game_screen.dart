@@ -21,10 +21,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
   bool isPlayerQuit = false;
 
   // C H A N C E S
-  int? chances = 5, missed = 0, remainingChances;
+  int chances = 5, missed = 0;
   late bool isPlayerDone;
 
-  // M I S S I O N S ~ I M A G E S
+  // M I S S I O N  ~ I M A G E S
   final List missionList = [
     const AssetImage('assets/mission1.jpeg'),
     const AssetImage('assets/mission2.jpeg'),
@@ -41,9 +41,6 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
   @override
   void initState() {
     super.initState();
-
-    // C H A N C E S
-    remainingChances = (chances! - missed!);
 
     // G A M E ~ I S ~ S T A R T E D?
     isPlayerDone = false;
@@ -71,6 +68,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         body: SafeArea(
       child: Column(
@@ -119,7 +117,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                 height: 21,
               ),
               Chances(
-                  remainingChances: remainingChances ?? 5, missed: missed ?? 0),
+                  chances: chances, missed: missed),
               const SizedBox(
                 height: 31,
               ),
@@ -217,11 +215,6 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                 children: [
                                   GradientLetter(
                                       marginRight: 7,
-                                      // letter: wordList.isEmpty
-                                      //     ? ' '
-                                      //     : wordList[whatMission].length - 1 < index
-                                      //         ? ' '
-                                      //         : wordList[whatMission][index],
                                       letter: wordList.isEmpty
                                           ? ' '
                                           : wordList[whatMission][index],
@@ -264,18 +257,6 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                               decoration: TextDecoration.underline,
                               fontWeight: FontWeight.w700,
                               color: Color(0xfffa9541)
-                              // foreground: Paint()
-                              //   ..shader = const LinearGradient(
-                              //           begin: Alignment.topLeft,
-                              //           end: Alignment.bottomRight,
-                              //           stops: [0.0661, 0.761],
-                              //           transform: GradientRotation(88.82),
-                              //           colors: [
-                              //             Color(0xffe86b02),
-                              //             Color(0xfffa9541)
-                              //           ])
-                              //       .createShader(const Rect.fromLTWH(
-                              //           0.0, 0.0, 200.0, 70.0))
                               ),
                         )
                       ],
@@ -292,91 +273,140 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
               width: double.infinity,
               height: 200,
               padding: const EdgeInsets.all(24),
-              child: Column(
-                // crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        gameData[whatMission]
-                            .wordThatPlayerHasToGuess
-                            .split('')
-                            .length,
-                        (index) => GestureDetector(
-                            onTap: () {
-                              for (int i = 0;
-                                  i < wordList[whatMission].length;
-                                  i++) {
-                                if (wordList[whatMission][i] == 'a') {
-                                  testingNumber = i;
-                                  if (wordList[whatMission].length - 1 == i) {
-                                    setState(() {
-                                      isPlayerDone = true;
-                                    });
-                                  }
-                                  break;
-                                }
-                              }
-                              setState(() {
-                                wordList[whatMission][testingNumber] =
-                                    gameData[whatMission]
-                                        .wordThatPlayerHasToGuess
-                                        .split('')[index]
-                                        .toString()
-                                        .toUpperCase();
+              child: GridView.builder(
+                    shrinkWrap: false,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 1,
+                    crossAxisCount: 7,
+                    ),
+                    itemCount: 14,
+                    itemBuilder: (BuildContext context, int index) {
+                    return GradientLetter(
+                    marginRight: 7,
+                    letter: letters[index]
+                        .toUpperCase(),
+                    containerHeight: 42,
+                    containerWidth: 42,
+                    containerRadius: 12,
+                    fontHeight: 38,
+                    fontsize: 26,
+                    textContainerHeight: 3 / 4,
+                    textContainerWidth: 3 / 4,
+                    textContainerRadius: 6);})
 
-                                if (isPlayerDone) {
-                                  if (listEquals(
-                                      gameData[whatMission]
-                                          .wordThatPlayerHasToGuess
-                                          .toUpperCase()
-                                          .split(''),
-                                      wordList[whatMission])) {
-                                    wordList[whatMission] =
-                                        gameData[whatMission]
-                                            .wordThatPlayerHasToGuess
-                                            .split('')
-                                            .map((e) => 'a')
-                                            .toList();
-                                    isPlayerDone = false;
-                                    score++;
-                                    if (score == gameData.length) {
-                                      isGameOver = true;
-                                    }
-                                  } else {
-                                    wordList[whatMission] =
-                                        gameData[whatMission]
-                                            .wordThatPlayerHasToGuess
-                                            .split('')
-                                            .map((e) => 'a')
-                                            .toList();
-                                    isPlayerDone = false;
-                                    score--;
-                                  }
-                                }
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                GradientLetter(
-                                    marginRight: 7,
-                                    letter: gameData[whatMission]
-                                        .wordThatPlayerHasToGuess
-                                        .split('')[index]
-                                        .toUpperCase(),
-                                    containerHeight: 42,
-                                    containerWidth: 42,
-                                    containerRadius: 12,
-                                    fontHeight: 38,
-                                    fontsize: 26,
-                                    textContainerHeight: 3 / 4,
-                                    textContainerWidth: 3 / 4,
-                                    textContainerRadius: 6),
-                              ],
-                            )),
-                      ))
-                ],
-              ),
+              // child: Column(
+              //   // crossAxisAlignment: CrossAxisAlignment.end,
+              //   children: [
+              //     Row(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         children: List.generate(
+              //           gameData[whatMission]
+              //               .wordThatPlayerHasToGuess
+              //               .split('')
+              //               .length,
+              //           (index) => GestureDetector(
+              //               onTap: () {
+              //                 for (int i = 0;
+              //                     i < wordList[whatMission].length;
+              //                     i++) {
+              //                   if (wordList[whatMission][i] == 'a') {
+              //                     testingNumber = i;
+              //                     if (wordList[whatMission].length - 1 == i) {
+              //                       setState(() {
+              //                         isPlayerDone = true;
+              //                       });
+              //                     }
+              //                     break;
+              //                   }
+              //                 }
+              //                 setState(() {
+              //                   wordList[whatMission][testingNumber] =
+              //                       gameData[whatMission]
+              //                           .wordThatPlayerHasToGuess
+              //                           .split('')[index]
+              //                           .toString()
+              //                           .toUpperCase();
+              //
+              //                   if (isPlayerDone) {
+              //                     if (listEquals(
+              //                         gameData[whatMission]
+              //                             .wordThatPlayerHasToGuess
+              //                             .toUpperCase()
+              //                             .split(''),
+              //                         wordList[whatMission])) {
+              //                       wordList[whatMission] =
+              //                           gameData[whatMission]
+              //                               .wordThatPlayerHasToGuess
+              //                               .split('')
+              //                               .map((e) => 'a')
+              //                               .toList();
+              //                       isPlayerDone = false;
+              //                       score++;
+              //                       if (score == gameData.length) {
+              //                         isGameOver = true;
+              //                       }
+              //                     } else {
+              //                       wordList[whatMission] =
+              //                           gameData[whatMission]
+              //                               .wordThatPlayerHasToGuess
+              //                               .split('')
+              //                               .map((e) => 'a')
+              //                               .toList();
+              //                       isPlayerDone = false;
+              //                       chances--;
+              //                       missed++;
+              //                       if(kDebugMode){
+              //                       print(missed);
+              //                       }
+              //                       // score--;
+              //                     }
+              //                   }
+              //                 });
+              //               },
+              //               // child: Row(
+              //               //   children: [
+              //               //     GradientLetter(
+              //               //         marginRight: 7,
+              //               //         letter: letters[index]
+              //               //             .toUpperCase(),
+              //               //         containerHeight: 42,
+              //               //         containerWidth: 42,
+              //               //         containerRadius: 12,
+              //               //         fontHeight: 38,
+              //               //         fontsize: 26,
+              //               //         textContainerHeight: 3 / 4,
+              //               //         textContainerWidth: 3 / 4,
+              //               //         textContainerRadius: 6),
+              //               //   ],
+              //               // ),
+              //             child : GridView.builder(
+              //               shrinkWrap: false,
+              //                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //                   childAspectRatio: 1,
+              //                   crossAxisCount: 7,
+              //                 ),
+              //                 itemCount: 14,
+              //                 itemBuilder: (BuildContext context, int index) {
+              //                   return  LayoutBuilder(builder: (context, constraints) {
+              //                     return         GradientLetter(
+              //                         marginRight: 7,
+              //                         letter: letters[index]
+              //                             .toUpperCase(),
+              //                         containerHeight: 42,
+              //                         containerWidth: 42,
+              //                         containerRadius: 12,
+              //                         fontHeight: 38,
+              //                         fontsize: 26,
+              //                         textContainerHeight: 3 / 4,
+              //                         textContainerWidth: 3 / 4,
+              //                         textContainerRadius: 6);
+              //                   });
+              //                 }
+              //             ),
+              //           ),
+              //         ))
+              //   ],
+              // ),
             ),
           )
         ],
@@ -419,10 +449,4 @@ class GameData {
       required this.question});
 }
 
-// letters = [
-//   ...gameData[whatMission].wordThatPlayerHasToGuess.split(''),
-//   ...List.generate(
-//       14 - gameData[whatMission].wordThatPlayerHasToGuess.split('').length,
-//       (index) => String.fromCharCode(65 + Random().nextInt(27)))
-// ];
-// letters.shuffle();
+
