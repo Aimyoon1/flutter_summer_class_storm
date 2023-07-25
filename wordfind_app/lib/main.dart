@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wordfind_app/screens/start_screen.dart';
 
+// ChangeNotifierProvider(
+//  create : (context) => UserInformation(),
+//  child : const MyApp()
+// )
 void main() {
   runApp(const MyApp());
 }

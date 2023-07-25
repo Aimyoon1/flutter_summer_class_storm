@@ -14,11 +14,15 @@ class DuringGameScreen extends StatefulWidget {
 }
 
 class _DuringGameScreenState extends State<DuringGameScreen> {
+  // D U R I N G G A M E
+  bool isGameOver = false;
+
   // P L A Y E R ~ W A N T S ~ Q U I T ~ T H E G A M E
   bool isPlayerQuit = false;
 
   // C H A N C E S
   int? chances = 5, missed = 0, remainingChances;
+  late bool isPlayerDone;
 
   // M I S S I O N S ~ I M A G E S
   final List missionList = [
@@ -40,6 +44,9 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
 
     // C H A N C E S
     remainingChances = (chances! - missed!);
+
+    // G A M E ~ I S ~ S T A R T E D?
+    isPlayerDone = false;
 
     wordList = List.generate(
         gameData.length,
@@ -302,6 +309,11 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                   i++) {
                                 if (wordList[whatMission][i] == 'a') {
                                   testingNumber = i;
+                                  if (wordList[whatMission].length - 1 == i) {
+                                    setState(() {
+                                      isPlayerDone = true;
+                                    });
+                                  }
                                   break;
                                 }
                               }
@@ -313,21 +325,34 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                         .toString()
                                         .toUpperCase();
 
-                                if (listEquals(
-                                    gameData[whatMission]
-                                        .wordThatPlayerHasToGuess
-                                        .toUpperCase()
-                                        .split(''),
-                                    wordList[whatMission])) {
-                                  if (kDebugMode) {
-                                    print('gg');
+                                if (isPlayerDone) {
+                                  if (listEquals(
+                                      gameData[whatMission]
+                                          .wordThatPlayerHasToGuess
+                                          .toUpperCase()
+                                          .split(''),
+                                      wordList[whatMission])) {
+                                    wordList[whatMission] =
+                                        gameData[whatMission]
+                                            .wordThatPlayerHasToGuess
+                                            .split('')
+                                            .map((e) => 'a')
+                                            .toList();
+                                    isPlayerDone = false;
+                                    score++;
+                                    if (score == gameData.length) {
+                                      isGameOver = true;
+                                    }
+                                  } else {
+                                    wordList[whatMission] =
+                                        gameData[whatMission]
+                                            .wordThatPlayerHasToGuess
+                                            .split('')
+                                            .map((e) => 'a')
+                                            .toList();
+                                    isPlayerDone = false;
+                                    score--;
                                   }
-                                  wordList[whatMission] = gameData[whatMission]
-                                      .wordThatPlayerHasToGuess
-                                      .split('')
-                                      .map((e) => 'a')
-                                      .toList();
-                                  score++;
                                 }
                               });
                             },
@@ -361,35 +386,37 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
 
   final List<GameData> gameData = [
     const GameData(
-      img: AssetImage('assets/mission1.jpeg'),
-      wordThatPlayerHasToGuess: 'Itachi',
-      hint: 'Sasuke\'s lil bro',
-      isPlayerDone: false,
-    ),
+        img: AssetImage('assets/mission1.jpeg'),
+        wordThatPlayerHasToGuess: 'Itachi',
+        hint: 'Sasuke\'s lil bro',
+        isPlayerDone: false,
+        question: 'Who is he?'),
     const GameData(
         img: AssetImage('assets/mission2.jpeg'),
         wordThatPlayerHasToGuess: 'Senku',
         hint: 'Sasuke\'s lil bro',
-        isPlayerDone: false),
+        isPlayerDone: false,
+        question: 'Who is he?'),
     const GameData(
         img: AssetImage('assets/mission3.jpeg'),
         wordThatPlayerHasToGuess: 'Chrollo',
         hint: 'Sasuke\'s lil bro',
-        isPlayerDone: false),
+        isPlayerDone: false,
+        question: 'Who is he?'),
   ];
 }
 
 class GameData {
   final AssetImage img;
-  final String wordThatPlayerHasToGuess, hint;
+  final String wordThatPlayerHasToGuess, hint, question;
   final bool isPlayerDone;
   // List<String> playerAnswerList;
-  const GameData({
-    required this.img,
-    required this.wordThatPlayerHasToGuess,
-    required this.hint,
-    required this.isPlayerDone,
-  });
+  const GameData(
+      {required this.img,
+      required this.wordThatPlayerHasToGuess,
+      required this.hint,
+      required this.isPlayerDone,
+      required this.question});
 }
 
 // letters = [
