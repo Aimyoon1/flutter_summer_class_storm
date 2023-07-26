@@ -2,12 +2,18 @@ import 'dart:math';
 // import 'package:flutter/foundation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/background_img.dart';
 import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/gradient_letter.dart';
 import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/gradient_text.dart';
+import 'package:wordfind_app/custom_widgets/3_during_game_screen/black_screen.dart';
 import 'package:wordfind_app/custom_widgets/3_during_game_screen/chances.dart';
+import 'package:wordfind_app/custom_widgets/3_during_game_screen/game_over.dart';
+import 'package:wordfind_app/custom_widgets/3_during_game_screen/quit_game.dart';
+// import 'package:wordfind_app/custom_widgets/3_during_game_screen/quit_game.dart';/
 
 class DuringGameScreen extends StatefulWidget {
-  const DuringGameScreen({super.key});
+  final String playerName;
+  const DuringGameScreen({super.key, required this.playerName});
 
   @override
   State<DuringGameScreen> createState() => _DuringGameScreenState();
@@ -18,7 +24,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
   bool isGameOver = false;
 
   // P L A Y E R ~ W A N T S ~ Q U I T ~ T H E G A M E
-  bool isPlayerQuit = false;
+  bool isPlayerWannaQuit = false;
 
   // C H A N C E S
   int chances = 5, missed = 0;
@@ -32,29 +38,71 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
   ];
 
   late List<String> letters;
-  late List wordList;
+  late List wordList = [
+    [-1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1]
+  ];
   late List sequence = [];
   late List randomLettersStatement = [];
   late List answerLettersWithRandomLetters;
   // late List a = [];
-  int testingNumber = 0;
+  int? testingNumber = -1;
 
   int whatMission = 0, score = 0;
+
+  void tryAgain() {
+    List newStart = List.generate(
+        gameData.length,
+        (int index) => List.generate(
+            gameData[index].wordThatPlayerHasToGuess.length, (int idx) => -1));
+
+    setState(() {
+      wordList = newStart;
+      isGameOver = false;
+      missed = 0;
+      score = 0;
+      chances = 5;
+    });
+  }
+
+  void quitGame() {
+    setState(() {
+      isPlayerWannaQuit = true;
+    });
+  }
+
+  void backToGame() {
+    setState(() {
+      isGameOver = false;
+      isPlayerWannaQuit = false;
+    });
+  }
+
+  void wantQuitGame() {
+    List newStart = List.generate(
+        gameData.length,
+        (int index) => List.generate(
+            gameData[index].wordThatPlayerHasToGuess.length, (int idx) => -1));
+    Navigator.pop(context);
+    setState(() {
+      wordList = newStart;
+      score = 0;
+      missed = 0;
+      chances = 5;
+      isGameOver = false;
+      isPlayerWannaQuit = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
+    if (kDebugMode) {
+      print(widget.playerName);
+    }
     // G A M E ~ I S ~ S T A R T E D?
     isPlayerDone = false;
-
-    wordList = List.generate(
-        gameData.length,
-        (index) => gameData[index]
-            .wordThatPlayerHasToGuess
-            .split('')
-            .map((e) => 'a')
-            .toList());
 
     answerLettersWithRandomLetters = List.generate(
         gameData.length,
@@ -69,315 +117,352 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
       if (kDebugMode) {
         randomLettersStatement = answerLettersWithRandomLetters[i];
         randomLettersStatement.shuffle();
-        // print(randomLettersStatement);
-        sequence.add(randomLettersStatement);
-        print(sequence);
-      }
-      // randomLettersStatement.add(answerLettersWithRandomLetters[i].shuffle());
-    }
-    if (kDebugMode) {
-      // print(randomLettersStatement);
-    }
-    // randomLettersStatement = List.generate(
-    //     gameData.length,
-    //     (index) => List.generate(
-    //         answerLettersWithRandomLetters[index].length,
-    //         (idx) => LetterStatement(
-    //             isClicked: false,
-    //             letter: answerLettersWithRandomLetters[index][idx])));
 
-    letters = [
-      ...gameData[whatMission].wordThatPlayerHasToGuess.split(''),
-      ...List.generate(
-          14 - gameData[whatMission].wordThatPlayerHasToGuess.split('').length,
-          (index) => String.fromCharCode(65 + Random().nextInt(27)))
-    ];
-    letters.shuffle();
+        sequence.add(randomLettersStatement);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+        body: Stack(
+      children: [
+        const BackgroundImg(backgroundImg: 'assets/back2.png'),
+        SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(left: 16),
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [Color(0xFFE86B02), Color(0xFFFA9541)])),
-                    child: IconButton(
-                        padding: const EdgeInsets.all(0),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.close,
-                          size: 23,
-                          color: Colors.white,
-                        )),
-                  ),
-                  const GradientText(text: 'Aimyon', size: 24),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset('assets/trophy.png'),
-                      const GradientText(text: '0', size: 20),
+                      GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 16),
+                            width: 32,
+                            height: 32,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFFE86B02),
+                                      Color(0xFFFA9541)
+                                    ])),
+                            child: IconButton(
+                                padding: const EdgeInsets.all(0),
+                                onPressed: () {
+                                  quitGame();
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  size: 23,
+                                  color: Colors.white,
+                                )),
+                          )),
+                      GradientText(text: widget.playerName, size: 24),
+                      Row(
+                        children: [
+                          Image.asset('assets/trophy.png'),
+                          const GradientText(text: '0', size: 20),
+                          const SizedBox(
+                            width: 16,
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 21,
+                  ),
+                  Chances(chances: chances, missed: missed),
+                  const SizedBox(
+                    height: 31,
+                  ),
+                  GradientText(text: '$score/${gameData.length}', size: 20),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFFE86B02),
+                                  Color(0xFFFA9541)
+                                ])),
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              whatMission == 0
+                                  ? whatMission = 0
+                                  : whatMission--;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.keyboard_arrow_left_outlined,
+                            color: Colors.white,
+                          ),
+                          padding: const EdgeInsets.all(0),
+                        ),
+                      ),
                       const SizedBox(
-                        width: 16,
+                        width: 10,
+                      ),
+                      Container(
+                        width: 265,
+                        height: 265,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                                color: const Color(0xfffa9541), width: 4),
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: gameData[whatMission].img)),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFFE86B02),
+                                  Color(0xFFFA9541)
+                                ])),
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              missionList.length - 1 != whatMission
+                                  ? whatMission++
+                                  : whatMission = missionList.length - 1;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.keyboard_arrow_right,
+                            color: Colors.white,
+                          ),
+                          padding: const EdgeInsets.all(0),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 27,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                        gameData[whatMission]
+                            .wordThatPlayerHasToGuess
+                            .split('')
+                            .length,
+                        (index) => Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      wordList[whatMission][index] = -1;
+                                      // wordList[whatMission][index] = 'a';
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      GradientLetter(
+                                          marginRight: 7,
+                                          // letter: '',
+                                          letter: wordList[whatMission].isEmpty
+                                              ? ''
+                                              : wordList[whatMission][index] ==
+                                                      -1
+                                                  ? ''
+                                                  : sequence[whatMission][
+                                                          wordList[whatMission]
+                                                              [index]]
+                                                      .toUpperCase(),
+                                          containerHeight: 42,
+                                          containerWidth: 42,
+                                          containerRadius: 12,
+                                          fontHeight: 38,
+                                          fontsize: 24,
+                                          textContainerHeight: 3 / 4,
+                                          textContainerWidth: 3 / 4,
+                                          textContainerRadius: 6),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            )),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {},
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage('assets/hint.png'))),
+                            ),
+                            const Text(
+                              'Hint',
+                              style: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  decoration: TextDecoration.underline,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xfffa9541)),
+                            )
+                          ],
+                        ),
                       )
                     ],
                   )
                 ],
               ),
-              const SizedBox(
-                height: 21,
-              ),
-              Chances(chances: chances, missed: missed),
-              const SizedBox(
-                height: 31,
-              ),
-              GradientText(text: '$score/${gameData.length}', size: 20),
-              const SizedBox(
-                height: 4,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [Color(0xFFE86B02), Color(0xFFFA9541)])),
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          whatMission == 0 ? whatMission = 0 : whatMission--;
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.keyboard_arrow_left_outlined,
-                        color: Colors.white,
-                      ),
-                      padding: const EdgeInsets.all(0),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    width: 265,
-                    height: 265,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                            color: const Color(0xfffa9541), width: 4),
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: gameData[whatMission].img)),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [Color(0xFFE86B02), Color(0xFFFA9541)])),
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          missionList.length - 1 != whatMission
-                              ? whatMission++
-                              : whatMission = missionList.length - 1;
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.keyboard_arrow_right,
-                        color: Colors.white,
-                      ),
-                      padding: const EdgeInsets.all(0),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 27,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                    gameData[whatMission]
-                        .wordThatPlayerHasToGuess
-                        .split('')
-                        .length,
-                    (index) => Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  wordList[whatMission][index] = 'a';
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  GradientLetter(
-                                      marginRight: 7,
-                                      letter: wordList.isEmpty
-                                          ? ' '
-                                          : wordList[whatMission][index],
-                                      containerHeight: 42,
-                                      containerWidth: 42,
-                                      containerRadius: 12,
-                                      fontHeight: 38,
-                                      fontsize: 24,
-                                      textContainerHeight: 3 / 4,
-                                      textContainerWidth: 3 / 4,
-                                      textContainerRadius: 6),
-                                ],
-                              ),
-                            )
-                          ],
-                        )),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage('assets/hint.png'))),
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                child: Container(
+                    color: Colors.black.withOpacity(0.1),
+                    width: double.infinity,
+                    height: 200,
+                    padding: const EdgeInsets.all(24),
+                    child: GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: 1,
+                          crossAxisCount: 7,
                         ),
-                        const Text(
-                          'Hint',
-                          style: TextStyle(
-                              fontFamily: 'Nunito',
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xfffa9541)),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                        itemCount: 14,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: wordList[whatMission].contains(index)
+                                ? null
+                                : () {
+                                    if (kDebugMode) {
+                                      // a[whatMission].add(index);
+                                      print('a');
+                                    }
+                                    for (int i = 0;
+                                        i < wordList[whatMission].length;
+                                        i++) {
+                                      if (wordList[whatMission][i] == -1) {
+                                        testingNumber = i;
+                                        if (wordList[whatMission].length - 1 ==
+                                            i) {
+                                          setState(() {
+                                            isPlayerDone = true;
+                                          });
+                                        }
+                                        break;
+                                      }
+                                    }
+
+                                    setState(() {
+                                      wordList[whatMission][testingNumber] =
+                                          index;
+
+                                      if (isPlayerDone) {
+                                        List check = List.generate(
+                                            wordList[whatMission].length,
+                                            (index) => sequence[whatMission][
+                                                    wordList[whatMission]
+                                                        [index]]
+                                                .toUpperCase());
+                                        if (kDebugMode) {
+                                          print(check);
+                                        }
+                                        if (listEquals(
+                                            gameData[whatMission]
+                                                .wordThatPlayerHasToGuess
+                                                .toUpperCase()
+                                                .split(''),
+                                            check)) {
+                                          whatMission++;
+                                          isPlayerDone = true;
+                                          score++;
+                                          if (score == gameData.length) {}
+                                        } else {
+                                          wordList[whatMission] =
+                                              gameData[whatMission]
+                                                  .wordThatPlayerHasToGuess
+                                                  .split('')
+                                                  .map((e) => -1)
+                                                  .toList();
+                                          isPlayerDone = false;
+                                          chances--;
+                                          missed++;
+
+                                          if (missed == 5) {
+                                            isGameOver = true;
+                                          }
+                                        }
+                                      }
+                                    });
+                                  },
+                            child: wordList[whatMission].contains(index)
+                                ? Container(
+                                    width: 42,
+                                    height: 42,
+                                    margin: const EdgeInsets.only(
+                                        right: 7, bottom: 7),
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple[100],
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                  )
+                                : GradientLetter(
+                                    marginRight: 7,
+                                    letter: sequence[whatMission][index]
+                                        .toUpperCase(),
+                                    containerHeight: 42,
+                                    containerWidth: 42,
+                                    containerRadius: 12,
+                                    fontHeight: 38,
+                                    fontsize: 26,
+                                    textContainerHeight: 3 / 4,
+                                    textContainerWidth: 3 / 4,
+                                    textContainerRadius: 6),
+                          );
+                        })),
               )
             ],
           ),
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Container(
-                color: Colors.deepPurple[100],
-                width: double.infinity,
-                height: 200,
-                padding: const EdgeInsets.all(24),
-                child: GridView.builder(
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: 1,
-                      crossAxisCount: 7,
-                    ),
-                    itemCount: 14,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () {
-                          // if (kDebugMode) {
-                          //   a[whatMission].add(index);
-                          //   print(a);
-                          // }
-                          for (int i = 0;
-                              i < wordList[whatMission].length;
-                              i++) {
-                            if (wordList[whatMission][i] == 'a') {
-                              testingNumber = i;
-                              if (wordList[whatMission].length - 1 == i) {
-                                setState(() {
-                                  isPlayerDone = true;
-                                });
-                              }
-                              break;
-                            }
-                          }
-                          setState(() {
-                            wordList[whatMission][testingNumber] =
-                                sequence[whatMission][index].toUpperCase();
-
-                            if (isPlayerDone) {
-                              if (listEquals(
-                                  gameData[whatMission]
-                                      .wordThatPlayerHasToGuess
-                                      .toUpperCase()
-                                      .split(''),
-                                  wordList[whatMission])) {
-                                wordList[whatMission] = gameData[whatMission]
-                                    .wordThatPlayerHasToGuess
-                                    .split('')
-                                    .map((e) => 'a')
-                                    .toList();
-                                isPlayerDone = false;
-                                score++;
-                                if (score == gameData.length) {
-                                  isGameOver = true;
-                                }
-                              } else {
-                                wordList[whatMission] = gameData[whatMission]
-                                    .wordThatPlayerHasToGuess
-                                    .split('')
-                                    .map((e) => 'a')
-                                    .toList();
-                                isPlayerDone = false;
-                                chances--;
-                                missed++;
-                                score--;
-                              }
-                            }
-                          });
-                        },
-                        child: GradientLetter(
-                            marginRight: 7,
-                            letter: sequence[whatMission][index].toUpperCase(),
-                            containerHeight: 42,
-                            containerWidth: 42,
-                            containerRadius: 12,
-                            fontHeight: 38,
-                            fontsize: 26,
-                            textContainerHeight: 3 / 4,
-                            textContainerWidth: 3 / 4,
-                            textContainerRadius: 6),
-                      );
-                    })),
-          )
-        ],
-      ),
+        ),
+        isGameOver || isPlayerWannaQuit ? const BlackScreen() : Container(),
+        isGameOver ? GameOver(tryAgain: tryAgain) : Container(),
+        // isPlayerWannaQuit ? const BlackScreen() : Container(),
+        isPlayerWannaQuit
+            ? QuitGame(backToGame: backToGame, wantQuitGame: wantQuitGame)
+            : Container()
+        // QuitGame()
+      ],
     ));
   }
 

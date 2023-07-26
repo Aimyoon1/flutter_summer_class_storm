@@ -18,8 +18,8 @@ class PlayerNameScreen extends StatefulWidget {
 }
 
 class _PlayerNameScreenState extends State<PlayerNameScreen> {
-  final TextEditingController playerNameFieldController =
-      TextEditingController();
+  TextEditingController playerNameFieldController = TextEditingController();
+  String name = '';
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,9 @@ class _PlayerNameScreenState extends State<PlayerNameScreen> {
 // F L O A T I N G A C T I O N B U T T O N
       floatingActionButton: MyFloatingActionButton(
           startPageContext: context,
-          navigateWidget: const DuringGameScreen(),
+          navigateWidget: DuringGameScreen(
+            playerName: playerNameFieldController.text.toString(),
+          ),
           btnName: 'Start',
           marginBottom: 0),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
