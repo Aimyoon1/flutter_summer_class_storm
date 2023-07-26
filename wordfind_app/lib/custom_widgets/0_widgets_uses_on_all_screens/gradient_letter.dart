@@ -28,7 +28,7 @@ class GradientLetter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: marginRight),
+      margin: EdgeInsets.only(right: marginRight, bottom: marginRight),
       width: containerWidth,
       height: containerHeight,
       decoration: BoxDecoration(
