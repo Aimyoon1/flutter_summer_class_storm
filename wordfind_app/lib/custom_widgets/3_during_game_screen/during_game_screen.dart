@@ -115,20 +115,22 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
       }
     }
 
-    if(hintChance > 0){
-      setState(() {
 
+    if (hintChance > 0) {
+      setState(() {
         wordList[whatMission][where] = where1;
         hintChance--;
-
-      }    );
+        if (kDebugMode) {
+          print('a');
+        }
+      });
     }
-
-
-
-
-
-
+    if (listEquals(gameData[whatMission].wordThatPlayerHasToGuess.split(''),
+        List.generate(wordList[whatMission].length, (index) => sequence[whatMission][wordList[whatMission][index]]))) {
+      if (kDebugMode) {
+        print('aaa');
+      }
+    }
   }
 
   @override
@@ -370,7 +372,6 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-
                           hint();
                         },
                         child: Row(
