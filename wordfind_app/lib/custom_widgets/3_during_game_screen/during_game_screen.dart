@@ -27,7 +27,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
   bool isPlayerWannaQuit = false;
 
   // C H A N C E S
-  int chances = 5, missed = 0;
+  int chances = 5, missed = 0, hintChance = 3;
   late bool isPlayerDone;
 
   // M I S S I O N  ~ I M A G E S
@@ -114,9 +114,21 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
         where1 = i;
       }
     }
-    setState(() {
-      wordList[whatMission][where] = where1;
-    });
+
+    if(hintChance > 0){
+      setState(() {
+
+        wordList[whatMission][where] = where1;
+        hintChance--;
+
+      }    );
+    }
+
+
+
+
+
+
   }
 
   @override
@@ -193,7 +205,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                       Row(
                         children: [
                           Image.asset('assets/trophy.png'),
-                          const GradientText(text: '0', size: 20),
+                          GradientText(text: '$hintChance', size: 20),
                           const SizedBox(
                             width: 16,
                           )
@@ -358,16 +370,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          // if (wordList[whatMission].length ==
-                          //         gameData[whatMission]
-                          //             .wordThatPlayerHasToGuess
-                          //             .length &&
-                          //     isPlayerDone) {
-                          //   setState(() {
-                          //     whatMission++;
-                          //     score++;
-                          //   });
-                          // }
+
                           hint();
                         },
                         child: Row(

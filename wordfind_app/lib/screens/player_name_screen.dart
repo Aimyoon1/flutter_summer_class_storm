@@ -18,8 +18,14 @@ class PlayerNameScreen extends StatefulWidget {
 }
 
 class _PlayerNameScreenState extends State<PlayerNameScreen> {
+
   TextEditingController playerNameFieldController = TextEditingController();
-  String name = '';
+  late String name;
+  void setPlayerName (String value){
+    setState(() {
+      name = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +74,7 @@ class _PlayerNameScreenState extends State<PlayerNameScreen> {
 
 // M Y T E X T F I E L D
                 MyTextField(
+                  setPlayerName : setPlayerName,
                   controller: playerNameFieldController,
                 ),
               ],

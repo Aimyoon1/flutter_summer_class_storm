@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class MyTextField extends StatefulWidget {
   final TextEditingController controller;
-
-  const MyTextField({super.key, required this.controller});
+  final Function setPlayerName;
+  const MyTextField({super.key, required this.controller, required this.setPlayerName});
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -23,6 +23,7 @@ class _MyTextFieldState extends State<MyTextField> {
           children: [
             TextField(
                 onChanged: (value) {
+                  widget.setPlayerName(value);
                   setState(() {
                     value == '' ? isShowIcon = false : isShowIcon = true;
                   });
