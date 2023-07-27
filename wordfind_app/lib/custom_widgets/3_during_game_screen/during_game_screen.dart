@@ -37,11 +37,14 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
     const AssetImage('assets/mission3.jpeg'),
   ];
 
+  // W I N N E R ?
+  bool isPlayerWin = false;
+
   late List<String> letters;
   late List wordList = [
     [-1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1]
+    [-1, -1, -1, -1, -1, -1, -1]
   ];
   late List sequence = [];
   late List randomLettersStatement = [];
@@ -58,8 +61,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
             gameData[index].wordThatPlayerHasToGuess.length, (int idx) => -1));
 
     setState(() {
+      whatMission = 0;
       wordList = newStart;
       isGameOver = false;
+      isPlayerWin = false;
       missed = 0;
       score = 0;
       chances = 5;
@@ -92,6 +97,25 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
       chances = 5;
       isGameOver = false;
       isPlayerWannaQuit = false;
+    });
+  }
+
+  void hint() {
+    late int where, where1;
+    for (int i = 0; i < wordList[whatMission].length; i++) {
+      if (wordList[whatMission][i] == -1) {
+        where = i;
+        break;
+      }
+    }
+    for (int i = 0; i < sequence[whatMission].length; i++) {
+      if (gameData[whatMission].wordThatPlayerHasToGuess[where] ==
+          sequence[whatMission][i]) {
+        where1 = i;
+      }
+    }
+    setState(() {
+      wordList[whatMission][where] = where1;
     });
   }
 
@@ -230,7 +254,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                 color: const Color(0xfffa9541), width: 4),
                             image: DecorationImage(
                                 fit: BoxFit.cover,
-                                image: gameData[whatMission].img)),
+                                image: gameData[whatMission < gameData.length
+                                        ? whatMission
+                                        : gameData.length - 1]
+                                    .img)),
                       ),
                       const SizedBox(
                         width: 10,
@@ -270,7 +297,9 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                        gameData[whatMission]
+                        gameData[whatMission < gameData.length
+                                ? whatMission
+                                : gameData.length - 1]
                             .wordThatPlayerHasToGuess
                             .split('')
                             .length,
@@ -288,14 +317,23 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                       GradientLetter(
                                           marginRight: 7,
                                           // letter: '',
-                                          letter: wordList[whatMission].isEmpty
+                                          letter: wordList[
+                                                      whatMission < gameData.length
+                                                          ? whatMission
+                                                          : gameData.length - 1]
+                                                  .isEmpty
                                               ? ''
-                                              : wordList[whatMission][index] ==
+                                              : wordList[whatMission < gameData.length
+                                                          ? whatMission
+                                                          : gameData.length -
+                                                              1][index] ==
                                                       -1
                                                   ? ''
-                                                  : sequence[whatMission][
-                                                          wordList[whatMission]
-                                                              [index]]
+                                                  : sequence[whatMission <
+                                                                  gameData.length
+                                                              ? whatMission
+                                                              : gameData.length - 1]
+                                                          [wordList[whatMission < gameData.length ? whatMission : gameData.length - 1][index]]
                                                       .toUpperCase(),
                                           containerHeight: 42,
                                           containerWidth: 42,
@@ -319,7 +357,19 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          // if (wordList[whatMission].length ==
+                          //         gameData[whatMission]
+                          //             .wordThatPlayerHasToGuess
+                          //             .length &&
+                          //     isPlayerDone) {
+                          //   setState(() {
+                          //     whatMission++;
+                          //     score++;
+                          //   });
+                          // }
+                          hint();
+                        },
                         child: Row(
                           children: [
                             Container(
@@ -362,7 +412,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                         itemCount: 14,
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
-                            onTap: wordList[whatMission].contains(index)
+                            onTap: wordList[whatMission < gameData.length
+                                        ? whatMission
+                                        : gameData.length - 1]
+                                    .contains(index)
                                 ? null
                                 : () {
                                     if (kDebugMode) {
@@ -404,10 +457,19 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                                 .toUpperCase()
                                                 .split(''),
                                             check)) {
-                                          whatMission++;
-                                          isPlayerDone = true;
-                                          score++;
-                                          if (score == gameData.length) {}
+                                          if (whatMission < gameData.length) {
+                                            whatMission++;
+                                            isPlayerDone = true;
+                                            score++;
+                                            isPlayerDone = false;
+                                          }
+
+                                          if (score == gameData.length) {
+                                            if (kDebugMode) {
+                                              print('a');
+                                            }
+                                            isPlayerWin = true;
+                                          }
                                         } else {
                                           wordList[whatMission] =
                                               gameData[whatMission]
@@ -426,7 +488,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                       }
                                     });
                                   },
-                            child: wordList[whatMission].contains(index)
+                            child: wordList[whatMission < gameData.length
+                                        ? whatMission
+                                        : gameData.length - 1]
+                                    .contains(index)
                                 ? Container(
                                     width: 42,
                                     height: 42,
@@ -439,7 +504,10 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
                                   )
                                 : GradientLetter(
                                     marginRight: 7,
-                                    letter: sequence[whatMission][index]
+                                    letter: sequence[
+                                            whatMission < gameData.length
+                                                ? whatMission
+                                                : gameData.length - 1][index]
                                         .toUpperCase(),
                                     containerHeight: 42,
                                     containerWidth: 42,
@@ -455,8 +523,16 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
             ],
           ),
         ),
+        isPlayerWin
+            ? AfterGame(tryAgain: tryAgain, btnText: 'PLAY AGAIN')
+            : Container(),
         isGameOver || isPlayerWannaQuit ? const BlackScreen() : Container(),
-        isGameOver ? GameOver(tryAgain: tryAgain) : Container(),
+        isGameOver
+            ? AfterGame(
+                tryAgain: tryAgain,
+                btnText: 'Try Again',
+              )
+            : Container(),
         // isPlayerWannaQuit ? const BlackScreen() : Container(),
         isPlayerWannaQuit
             ? QuitGame(backToGame: backToGame, wantQuitGame: wantQuitGame)
@@ -481,7 +557,7 @@ class _DuringGameScreenState extends State<DuringGameScreen> {
         question: 'Who is he?'),
     const GameData(
         img: AssetImage('assets/mission3.jpeg'),
-        wordThatPlayerHasToGuess: 'Chrollo',
+        wordThatPlayerHasToGuess: 'Dulguun',
         hint: 'Sasuke\'s lil bro',
         isPlayerDone: false,
         question: 'Who is he?'),

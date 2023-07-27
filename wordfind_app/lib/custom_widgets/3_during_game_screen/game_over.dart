@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:wordfind_app/custom_widgets/0_widgets_uses_on_all_screens/gradient_text.dart';
 import 'package:wordfind_app/custom_widgets/3_during_game_screen/dynamic_btn.dart';
 
-class GameOver extends StatefulWidget {
+class AfterGame extends StatefulWidget {
   final Function tryAgain;
-  const GameOver({super.key, required this.tryAgain});
+  final String btnText;
+  const AfterGame({super.key, required this.tryAgain, required this.btnText});
 
   @override
-  State<GameOver> createState() => _GameOverState();
+  State<AfterGame> createState() => _AfterGameState();
 }
 
-class _GameOverState extends State<GameOver> {
+class _AfterGameState extends State<AfterGame> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -56,12 +57,12 @@ class _GameOverState extends State<GameOver> {
               ),
               Column(
                 children: [
-                  const GradientText(text: 'GAME OVER', size: 26),
+                  const GradientText(text: 'Winner!', size: 26),
                   DynamicBtn(
                     tryAgain: widget.tryAgain,
                     width: 292,
                     height: 60,
-                    btnText: 'Try Again',
+                    btnText: widget.btnText,
                   )
                 ],
               )
