@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icodegram/datas/users.dart';
+import 'package:icodegram/screens/messenger.dart';
+import 'package:icodegram/screens/story_detail.dart';
 import 'package:icodegram/widgets/custom_make_icon_animate.dart';
 // import 'package:icodegram/utils/utility.dart';
 import 'package:icodegram/widgets/lobster_text.dart';
@@ -81,51 +83,90 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isIconAnimate = false;
   bool isLiked = false;
 
+  // Navigate messenger screen
+  void _navigateMessengerScreen() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const MessengerScreen(
+                  userImg: 'assets/images/users/Dulguunuu.jpeg',
+                )));
+  }
+
   Widget _appName() {
-    return const Column(
+    return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 8),
-          child: LobsterText(
-            text: 'Temichika  ',
-            size: 25,
+          padding: const EdgeInsets.only(left: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const LobsterText(
+                text: 'Temichika  ',
+                size: 25,
+              ),
+              GestureDetector(
+                onTap: _navigateMessengerScreen,
+                child: SizedBox(
+                  width: 35,
+                  height: 35,
+                  child: Image.asset(
+                    'assets/icons/chat.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         )
       ],
     );
   }
 
-  Widget _makeStory({userImg, userName, userStory}) {
-    return Container(
-      margin: const EdgeInsets.only(right: 16),
-      child: Column(
-        children: [
-          MakeStoryContainer(
-              height: 70,
-              marginBottom: 5,
-              width: 70,
-              userImg: userImg,
-              userName: userName,
-              userStory: userStory),
-          RubikText(
-            text: userName,
-            size: 12,
-            textColor: const Color(0xffF9F9F9),
-          )
-        ],
+  Widget _makeStory({userImg, userName, userStory, context}) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => StoryDetailScreen(
+                      userName: userName,
+                      userImg: userImg,
+                      story: userStory,
+                    )));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 16),
+        child: Column(
+          children: [
+            MakeStoryContainer(
+                height: 70,
+                marginBottom: 5,
+                width: 70,
+                userImg: userImg,
+                userName: userName,
+                userStory: userStory),
+            RubikText(
+              text: userName,
+              size: 12,
+              textColor: const Color(0xffF9F9F9),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget _makeStories() {
+  Widget _makeStories({context}) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: iCodeUsersStoryData
             .map((e) => _makeStory(
+                context: context,
                 userImg: e.userImg,
                 userName: e.userName,
                 userStory: e.userStoryImg))
@@ -143,10 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_appName(), _makeStories()],
+        children: [_appName(), _makeStories(context: context)],
       ),
     );
   }
+
+  // Navigate The User Detail not Profile page
+  void navigateUserDetailScreen() {}
 
   Widget _headerOfThePost({userImg, userName, userStory}) {
     return Padding(
@@ -155,14 +199,17 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              MakeStoryContainer(
-                  width: 42,
-                  height: 42,
-                  marginBottom: 0,
-                  marginRight: 10,
-                  userImg: userImg,
-                  userName: userName,
-                  userStory: userStory),
+              GestureDetector(
+                onLongPress: () {},
+                child: MakeStoryContainer(
+                    width: 42,
+                    height: 42,
+                    marginBottom: 0,
+                    marginRight: 10,
+                    userImg: userImg,
+                    userName: userName,
+                    userStory: userStory),
+              ),
               RubikText(
                 text: userName,
                 size: 16,

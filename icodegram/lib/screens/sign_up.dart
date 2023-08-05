@@ -7,9 +7,20 @@ import 'package:icodegram/widgets/my_gradient_text.dart';
 import 'package:icodegram/widgets/my_textfield.dart';
 import 'package:icodegram/widgets/rubik_text.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   final Function setIsClientHasAccount;
   const RegisterScreen({super.key, required this.setIsClientHasAccount});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +72,10 @@ class RegisterScreen extends StatelessWidget {
   }
 
   Widget _getPhoneNumber() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: phoneNumberController,
           text: 'Утасны дугаар',
         ),
         SizedBox(
@@ -74,9 +86,10 @@ class RegisterScreen extends StatelessWidget {
   }
 
   Widget _getUserName() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: userNameController,
           text: 'Нэвтрэх нэр',
         ),
         SizedBox(
@@ -87,9 +100,10 @@ class RegisterScreen extends StatelessWidget {
   }
 
   Widget _getUserPassword() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: passwordController,
           text: 'Нууц үг',
           obscureText: true,
         ),
@@ -101,9 +115,10 @@ class RegisterScreen extends StatelessWidget {
   }
 
   Widget _confirmPassword() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: confirmPasswordController,
           text: 'Нууц үг давтах',
           obscureText: true,
         ),
@@ -154,7 +169,7 @@ class RegisterScreen extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                setIsClientHasAccount();
+                widget.setIsClientHasAccount();
               },
               child: const MyGradientText(text: 'Нэвтрэх'),
             )

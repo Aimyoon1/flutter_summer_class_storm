@@ -15,6 +15,11 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  // TextEditingController nameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +80,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _fields() {
-    return const Column(
+    return Column(
       children: [
         SizedBox(
           height: 31,
@@ -94,7 +99,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Expanded(
               flex: 4,
-              child: MyTextField(text: 'Name'),
+              child: MyTextField(
+                text: 'Name',
+                controller: nameController,
+              ),
             )
           ],
         ),
@@ -115,7 +123,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Expanded(
               flex: 4,
-              child: MyTextField(text: 'rubydd'),
+              child: MyTextField(
+                text: 'rubydd',
+                controller: userNameController,
+              ),
             )
           ],
         ),
@@ -136,26 +147,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Expanded(
               flex: 4,
-              child: MyTextField(text: 'Dulguunu'),
+              child: MyTextField(
+                text: 'Dulguunu',
+                controller: passwordController,
+              ),
             )
           ],
         ),
       ],
     );
   }
-
-  // Widget _singleField({whatField, fieldLabel}) {
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //         flex: 1,
-  //         child: RubikText(text: whatField),
-  //       ),
-  //       Expanded(
-  //         flex: 4,
-  //         child: MyTextField(text: fieldLabel),
-  //       )
-  //     ],
-  //   );
-  // }
 }

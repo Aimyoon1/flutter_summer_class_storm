@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:icodegram/datas/users.dart';
 import 'package:icodegram/screen-managers/after_login.dart';
+import 'package:icodegram/services/auth/auth_service.dart';
 
 import 'package:icodegram/widgets/lobster_text.dart';
 import 'package:icodegram/widgets/my_button.dart';
 import 'package:icodegram/widgets/my_gradient_text.dart';
 import 'package:icodegram/widgets/my_textfield.dart';
 import 'package:icodegram/widgets/rubik_text.dart';
+import 'package:provider/provider.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   final Function setIsClientHasAccount;
   const SignInScreen({super.key, required this.setIsClientHasAccount});
 
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  // Controllers
+  TextEditingController emailController = TextEditingController();
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,12 +64,13 @@ class SignInScreen extends StatelessWidget {
   }
 
   Widget _getUserName() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: userNameController,
           text: 'Нэвтрэх нэр',
         ),
-        SizedBox(
+        const SizedBox(
           height: 14,
         ),
       ],
@@ -63,13 +78,14 @@ class SignInScreen extends StatelessWidget {
   }
 
   Widget _getUserPassword() {
-    return const Column(
+    return Column(
       children: [
         MyTextField(
+          controller: passwordController,
           text: 'Нууц үг',
           obscureText: true,
         ),
-        SizedBox(
+        const SizedBox(
           height: 48,
         ),
       ],
@@ -77,10 +93,16 @@ class SignInScreen extends StatelessWidget {
   }
 
   // FUNCTIONS
-
-  void signIn({context}) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const ScreenAfterLogin()));
+  void signIn(email, password) async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    try {
+      await authService.signIn(email, password);
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+    // Navigator.push(context,
+    //     MaterialPageRoute(builder: (context) => const ScreenAfterLogin()));
   }
 
   Widget _signInBtn({context}) {
@@ -88,7 +110,7 @@ class SignInScreen extends StatelessWidget {
       children: [
         MyButton(
             action: () {
-              signIn(context: context);
+              signIn(emailController.text, passwordController.text);
             },
             gradientColor: true,
             text: 'Нэвтрэх'),
@@ -123,7 +145,7 @@ class SignInScreen extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                setIsClientHasAccount();
+                widget.setIsClientHasAccount();
               },
               child: const MyGradientText(text: 'Бүртгүүлэх'),
             )

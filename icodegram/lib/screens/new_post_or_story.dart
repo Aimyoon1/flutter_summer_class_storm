@@ -8,9 +8,15 @@ import 'package:icodegram/widgets/my_button.dart';
 import 'package:icodegram/widgets/my_textfield.dart';
 import 'package:icodegram/widgets/rubik_text.dart';
 
-class NewPostOrStoryScreen extends StatelessWidget {
+class NewPostOrStoryScreen extends StatefulWidget {
   const NewPostOrStoryScreen({super.key});
 
+  @override
+  State<NewPostOrStoryScreen> createState() => _NewPostOrStoryScreenState();
+}
+
+class _NewPostOrStoryScreenState extends State<NewPostOrStoryScreen> {
+  TextEditingController descriptionOfPostController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +118,7 @@ class NewPostOrStoryScreen extends StatelessWidget {
           height: 12,
         ),
         MyTextField(
+          controller: descriptionOfPostController,
           text: 'Энд бичнэ үү.',
           maxLines: 5,
           borderRadius: 16,
